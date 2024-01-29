@@ -31,24 +31,21 @@ class Graph:
 
 if __name__ == '__main__':
     g = Graph()
-    while True:
-        print("1. Add Edge.")
-        print("2. Print if IDDFS is Possible.")
-        print("3. Exit")
-        flag = int(input("Enter Your Choice:"))
-        if flag == 1:
-            g.addEdge(int(input("Enter u: ")), int(input("Enter v: ")))
-        elif flag == 2:
-            target = int(input("Enter the target: "))
-            maxDepth = int(input("Enter the maximum depth: "))
-            src = int(input("Enter the Start node: "))
-            if g.IDDFS(src, target, maxDepth):
-                print("Target is reachable from source " +
-                      "within max depth")
-            else:
-                print("Target is NOT reachable from source " +
-                      "within max depth")
-        elif flag == 3:
-            break
-        else:
-            print("Invalid")
+    V = int(input("Enter the number of vertices: "))
+    for i in range(V):
+        print("Enter u v : ")
+        ip = input().split()
+        g.addEdge(int(ip[0]), int(ip[1]))
+    target = int(input("Enter the target: "))
+    maxDepth = int(input("Enter the maximum depth: "))
+    src = int(input("Enter the Start node: "))
+    if g.IDDFS(src, target, maxDepth):
+        print("Target is reachable from source " +
+              "within max depth")
+    else:
+        print("Target is NOT reachable from source " +
+              "within max depth")
+
+
+
+

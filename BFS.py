@@ -32,17 +32,14 @@ class Graph:
 
 if __name__ == '__main__':
     g = Graph()
-    while True:
-        print("1. Add Edge.")
-        print("2. Print BFS.")
-        print("3. Exit")
-        flag = int(input("Enter Your Choice:"))
-        if flag == 1:
-            g.addEdge(int(input("Enter u: ")), int(input("Enter v: ")))
-        elif flag == 2:
-            print(f"Following is Breadth First Traversal")
-            g.BFS(int(input("Enter the start node: ")))
-        elif flag == 3:
-            break
-        else:
-            print("Invalid")
+    goal_list = list()
+    V = int(input("Enter the number of vertices: "))
+    for i in range(V):
+        print("Enter u v : ")
+        ip = input().split()
+        g.addEdge(int(ip[0]), int(ip[1]))
+    print(f"Following is Breadth First Traversal")
+    g.BFS(int(input("Enter the start node: ")))
+
+
+

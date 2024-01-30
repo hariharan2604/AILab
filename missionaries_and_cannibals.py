@@ -1,16 +1,40 @@
-def get_valid_input(message, min_value, max_value):
-    while True:
-        try:
-            user_input = int(input(message))
-            if min_value <= user_input <= max_value:
-                return user_input
+from collections import deque
+
+
+class State:
+    def __init__(self, left_m, left_c, right_m, right_c, boat):
+        self.left_m = left_m
+        self.left_c = left_c
+        self.right_m = right_m
+        self.right_c = right_c
+        self.boat = boat
+
+    def is_valid(self):
+        if self.left_m < 0 or self.left_c < 0 or self.right_m < 0 or self.right_c < 0:
+            return False
+        if (self.left_c > self.left_m > 0) or (self.right_c > self.right_m > 0):
+            return False
+        return True
+
+    def is_goal(self):
+        return self.left_m == 0 and self.left_c == 0
+
+    def successors(self):
+        moves = [(1, 0), (0, 1), (2, 0), (0, 2), (1, 1)]
+        next_states = []
+        for move in moves:
+            if self.boat == 'left':
+                new_state = State(self.left_m - move[0], self.left_c - move[1],
+                                  self.right_m + move[0], self.right_c + move[1], 'right')
             else:
-                print(f"Input must be between {min_value} and {max_value}. Please re-enter.")
-        except ValueError:
-            print("Invalid input. Please enter a valid integer.")
+                new_state = State(self.left_m + move[0], self.left_c + move[1],
+                                  self.right_m - move[0], self.right_c - move[1], 'left')
+            if new_state.is_valid():
+                next_states.append(new_state)
+        return next_states
+
 
 def print_board(left_m, left_c, right_m, right_c):
-    print("\n")
     for i in range(0, left_m):
         print("M ", end="")
     for i in range(0, left_c):
@@ -22,80 +46,39 @@ def print_board(left_m, left_c, right_m, right_c):
         print("C ", end="")
     print("\n")
 
-try:
-    print("\nGame Start\nNow the task is to move all of them to the right side of the river")
-    print("Rules:\n1. The boat can carry at most two people\n2. If cannibals number is greater than missionaries, "
-          "then the cannibals would eat the missionaries\n3. The boat cannot cross the river by itself with no people "
-          "on board")
 
-    lM = 3  # Left side Missionaries number
-    lC = 3  # Left side Cannibals number
-    rM = 0  # Right side Missionaries number
-    rC = 0  # Right side cannibals number
-    userM = 0  # User input for the number of missionaries for right to left side travel
-    userC = 0  # User input for the number of cannibals for right to left travel
-    k = 0
+def bfs(initial_state):
+    visited = set()
+    queue = deque([[initial_state]])
+    while queue:
+        path = queue.popleft()
+        state = path[-1]
+        if state.is_goal():
+            return path
+        for succ in state.successors():
+            if tuple([succ.left_m, succ.left_c, succ.right_m, succ.right_c, succ.boat]) not in visited:
+                visited.add(tuple([succ.left_m, succ.left_c, succ.right_m, succ.right_c, succ.boat]))
+                new_path = list(path)
+                new_path.append(succ)
+                queue.append(new_path)
+    return None
 
-    print_board(lM, lC, rM, rC)
 
-    while True:
-        # Left side to right side river travel
-        while True:
-            print("Left side -> right side river travel")
-            uM = get_valid_input("Enter the number of Missionaries to travel => ", 0, 2)
-            uC = get_valid_input("Enter the number of Cannibals to travel => ", 0, 2)
+def print_path(path):
+    for i, state in enumerate(path):
+        print(f"Step {i}:")
+        print_board(state.left_m, state.left_c, state.right_m, state.right_c)
 
-            if uM == 0 and uC == 0:
-                print("Empty travel not possible. Re-enter.")
-            elif (uM + uC) <= 2 and (lM - uM) >= 0 and (lC - uC) >= 0:
-                break
-            else:
-                print("Invalid input. Re-enter.")
 
-        lM -= uM
-        lC -= uC
-        rM += uM
-        rC += uC
+def main():
+    initial_state = State(3, 3, 0, 0, 'left')
+    path = bfs(initial_state)
+    if path:
+        print("The Steps...\n")
+        print_path(path)
+    else:
+        print("No solution found.")
 
-        print_board(lM, lC, rM, rC)
 
-        k += 1
-
-        if (lC == 3 and lM == 1) or (lC == 3 and lM == 2) or (lC == 2 and lM == 1) or (rC == 3 and rM == 1) or (
-                rC == 3 and rM == 2) or (rC == 2 and rM == 1):
-            print("Cannibals eat missionaries: You lost the game")
-            break
-
-        if (rM + rC) == 6:
-            print("You won the game : Congrats")
-            print("Total attempts:", k)
-            break
-
-        # Right side to left side river travel
-        while True:
-            print("Right side -> Left side river travel")
-            userM = get_valid_input("Enter the number of Missionaries to travel => ", 0, 2)
-            userC = get_valid_input("Enter the number of Cannibals to travel => ", 0, 2)
-
-            if userM == 0 and userC == 0:
-                print("Empty travel not possible. Re-enter.")
-            elif (userM + userC) <= 2 and (rM - userM) >= 0 and (rC - userC) >= 0:
-                break
-            else:
-                print("Invalid input. Re-enter.")
-
-        lM += userM
-        lC += userC
-        rM -= userM
-        rC -= userC
-
-        k += 1
-        print_board(lM, lC, rM, rC)
-
-        if (lC == 3 and lM == 1) or (lC == 3 and lM == 2) or (lC == 2 and lM == 1) or (rC == 3 and rM == 1) or (
-                rC == 3 and rM == 2) or (rC == 2 and rM == 1):
-            print("Cannibals eat missionaries: You lost the game")
-            break
-
-except EOFError as e:
-    print("\nInvalid input. Please retry!")
+if __name__ == "__main__":
+    main()

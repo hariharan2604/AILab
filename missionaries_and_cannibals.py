@@ -70,15 +70,13 @@ def print_path(path):
         print_board(state.left_m, state.left_c, state.right_m, state.right_c)
 
 
-def main():
-    initial_state = State(3, 3, 0, 0, 'left')
+if __name__ == "__main__":
+    print("Enter M and C: ")
+    m, c = map(int, input().split())
+    initial_state = State(m, c, 0, 0, 'left')
     path = bfs(initial_state)
     if path:
         print("The Steps...\n")
         print_path(path)
     else:
         print("No solution found.")
-
-
-if __name__ == "__main__":
-    main()
